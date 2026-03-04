@@ -10,7 +10,7 @@ import {
   BarChart2,
   Activity,
 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
 import { FORMS, COLORS, COPYRIGHT_TEXT } from './data/forms';
 import { createEmptyState, generateSampleData, computeSubtestResult, formatPct, pctColorClass, pctBgClass } from './data/utils';
