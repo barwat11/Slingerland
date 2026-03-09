@@ -1,13 +1,788 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>slingerland-calculator</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Slingerland&reg; Literacy Institute | Multisensory Structured Literacy</title>
+    <meta name="description" content="The Slingerland Literacy Institute trains educators in multisensory, Science of Reading-aligned approaches so all students can learn to read.">
+
+    <!-- IBM Plex Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS with Custom Slingerland Configuration -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- jsPDF for PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"IBM Plex Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        ibm: {
+                            blue: '#005C8A',
+                            blueHover: '#004368',
+                            white: '#FFFFFF',
+                            gray10: '#F0F4F8',
+                            gray70: '#475569',
+                            gray90: '#0A2540',
+                            gray100: '#0F172A',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-padding-top: 5rem; }
+        details > summary { list-style: none; }
+        details > summary::-webkit-details-marker { display: none; }
+        details[open] summary ~ * { animation: sweep .3s ease-in-out; }
+        @keyframes sweep {
+            0%    {opacity: 0; margin-top: -10px}
+            100%  {opacity: 1; margin-top: 0px}
+        }
+        /* Mobile menu animation */
+        .mobile-menu { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
+        .mobile-menu.open { max-height: 500px; }
+    </style>
+</head>
+<body class="font-sans text-ibm-gray100 bg-ibm-white antialiased selection:bg-ibm-blue selection:text-white">
+
+    <!-- Global Navigation -->
+    <header class="fixed top-0 w-full bg-ibm-white/95 backdrop-blur-sm border-b border-gray-200 z-50 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="text-xl font-semibold tracking-tight text-ibm-gray100">
+                Slingerland<span class="text-ibm-blue">&reg;</span> Institute
+            </div>
+            <nav class="hidden lg:flex space-x-6 text-sm font-medium">
+                <a href="#home" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">Home</a>
+                <a href="#approach" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">Approach</a>
+                <a href="#classes" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">Classes &amp; Cert</a>
+                <a href="#tutors" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">Schools &amp; Tutors</a>
+                <a href="#shop" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">Shop</a>
+                <a href="#about" class="text-ibm-gray70 hover:text-ibm-blue transition-colors">About Us</a>
+            </nav>
+            <div class="hidden lg:flex items-center space-x-4">
+                <a href="#" class="text-sm font-medium text-ibm-gray70 hover:text-ibm-blue">Log In</a>
+                <a href="#donate" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-ibm-blue bg-ibm-gray10 border border-ibm-blue hover:bg-ibm-blue hover:text-white transition-colors duration-200">
+                    Donate
+                </a>
+            </div>
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-btn" class="lg:hidden text-ibm-gray100 focus:outline-none" aria-label="Open Menu">
+                <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu lg:hidden bg-ibm-white border-t border-gray-200">
+            <nav class="flex flex-col px-6 py-4 space-y-3 text-sm font-medium">
+                <a href="#home" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Home</a>
+                <a href="#approach" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Approach</a>
+                <a href="#classes" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Classes &amp; Cert</a>
+                <a href="#tutors" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Schools &amp; Tutors</a>
+                <a href="#shop" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Shop</a>
+                <a href="#about" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">About Us</a>
+                <hr class="border-gray-200">
+                <a href="#" class="text-ibm-gray70 hover:text-ibm-blue transition-colors py-2">Log In</a>
+                <a href="#donate" class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-ibm-blue bg-ibm-gray10 border border-ibm-blue hover:bg-ibm-blue hover:text-white transition-colors duration-200 text-center">
+                    Donate
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Section 1: Hero / Introduction -->
+    <section id="home" class="pt-32 pb-20 md:pt-40 md:pb-24 px-6 bg-ibm-white">
+        <div class="max-w-7xl mx-auto text-center max-w-4xl">
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-light leading-tight text-ibm-gray100 mb-6">
+                Bringing meaning and structure to the <span class="font-semibold text-ibm-blue">teaching of reading.</span>
+            </h1>
+            <p class="text-lg md:text-xl text-ibm-gray70 leading-relaxed mb-10">
+                The Slingerland&reg; Literacy Institute is a 501(c)(3) non-profit that trains educators of all kinds in a multisensory, Science of Reading-aligned approach so <strong>all students</strong> can learn to read.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#classes" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-ibm-blue hover:bg-ibm-blueHover transition-colors duration-200 shadow-lg">
+                    Find a Class
+                </a>
+                <a href="#approach" class="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-ibm-blue bg-ibm-gray10 hover:bg-gray-200 transition-colors duration-200">
+                    Explore the Approach
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: For Whom (Target Audiences) -->
+    <section class="py-16 px-6 bg-ibm-gray10 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-2xl md:text-3xl font-light text-ibm-gray100">Empowering <span class="font-semibold">Every Educator</span></h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                <div class="bg-ibm-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-ibm-gray100 mb-2">Classroom Teachers</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Adapt Orton-Gillingham principles for your whole-class tier 1 instruction.</p>
+                    <a href="#classes" class="text-sm font-medium text-ibm-blue hover:underline">Get Trained &rarr;</a>
+                </div>
+                <div class="bg-ibm-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-ibm-gray100 mb-2">Interventionists</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Gain diagnostic tools and intensive strategies for struggling readers.</p>
+                    <a href="#classes" class="text-sm font-medium text-ibm-blue hover:underline">View Classes &rarr;</a>
+                </div>
+                <div class="bg-ibm-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-ibm-gray100 mb-2">Tutors</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Enhance your 1-on-1 practice with IMSLEC accredited certification.</p>
+                    <a href="#certification" class="text-sm font-medium text-ibm-blue hover:underline">See Certification &rarr;</a>
+                </div>
+                <div class="bg-ibm-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-ibm-gray100 mb-2">Schools &amp; Districts</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Partner with us for group training and systemic literacy transformation.</p>
+                    <a href="#contact" class="text-sm font-medium text-ibm-blue hover:underline">Partner With Us &rarr;</a>
+                </div>
+                <div class="bg-ibm-white p-6 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                    <h3 class="font-semibold text-ibm-gray100 mb-2">Parents</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Find qualified help, understand dyslexia, and support your child at home.</p>
+                    <a href="#tutors" class="text-sm font-medium text-ibm-blue hover:underline">Find a Tutor &rarr;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Video & Why Slingerland? -->
+    <section class="py-24 px-6 bg-ibm-white">
+        <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+            <!-- Video Placeholder -->
+            <div class="relative bg-ibm-gray90 aspect-video flex flex-col items-center justify-center text-white shadow-xl">
+                <svg class="w-16 h-16 text-ibm-blue opacity-80 mb-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                <p class="font-medium text-lg">Introduction to Slingerland</p>
+                <p class="text-sm text-gray-400 mt-2 text-center px-8">Watch to learn how multisensory structured literacy transforms the classroom.</p>
+            </div>
+
+            <!-- Why Slingerland -->
+            <div>
+                <h2 class="text-3xl md:text-4xl font-light mb-6">Why <span class="font-semibold">Slingerland?</span></h2>
+                <p class="text-lg text-ibm-gray70 mb-6">
+                    We bridge the gap between clinical intervention and general education. Our method is:
+                </p>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 text-ibm-blue mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div>
+                            <strong class="text-ibm-gray100">Evidence-Aligned:</strong> Rooted deeply in the Science of Reading.
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 text-ibm-blue mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div>
+                            <strong class="text-ibm-gray100">Multisensory:</strong> Simultaneously engages visual, auditory, and kinesthetic-motor pathways.
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 text-ibm-blue mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div>
+                            <strong class="text-ibm-gray100">Classroom-Implementable:</strong> Adaptable to any existing curriculum or text.
+                        </div>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-6 h-6 text-ibm-blue mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <div>
+                            <strong class="text-ibm-gray100">Preventative &amp; Remedial:</strong> Supports diverse learners, including those with dyslexia, before they fail.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: The Approach & Science of Reading -->
+    <section id="approach" class="py-24 px-6 bg-ibm-gray10 border-y border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-light mb-4">The Slingerland <span class="font-semibold">Approach</span></h2>
+                <p class="text-lg text-ibm-gray70">
+                    A jargon-free, simultaneous, multisensory method. We teach the structure of the English language explicitly, encompassing all five pillars of the Science of Reading.
+                </p>
+            </div>
+
+            <!-- Science of Reading 5 Pillars -->
+            <div class="grid md:grid-cols-5 gap-4 mb-16">
+                <div class="bg-ibm-white p-4 border-t-4 border-ibm-blue text-center shadow-sm">
+                    <h4 class="font-semibold text-ibm-gray100">Phonemic Awareness</h4>
+                    <p class="text-xs text-ibm-gray70 mt-2">Hearing and manipulating individual sounds.</p>
+                </div>
+                <div class="bg-ibm-white p-4 border-t-4 border-ibm-blue text-center shadow-sm">
+                    <h4 class="font-semibold text-ibm-gray100">Phonics</h4>
+                    <p class="text-xs text-ibm-gray70 mt-2">Mapping sounds to letters for encoding &amp; decoding.</p>
+                </div>
+                <div class="bg-ibm-white p-4 border-t-4 border-ibm-blue text-center shadow-sm">
+                    <h4 class="font-semibold text-ibm-gray100">Fluency</h4>
+                    <p class="text-xs text-ibm-gray70 mt-2">Reading with accuracy, speed, and expression.</p>
+                </div>
+                <div class="bg-ibm-white p-4 border-t-4 border-ibm-blue text-center shadow-sm">
+                    <h4 class="font-semibold text-ibm-gray100">Vocabulary</h4>
+                    <p class="text-xs text-ibm-gray70 mt-2">Understanding words in isolation and context.</p>
+                </div>
+                <div class="bg-ibm-white p-4 border-t-4 border-ibm-blue text-center shadow-sm">
+                    <h4 class="font-semibold text-ibm-gray100">Comprehension</h4>
+                    <p class="text-xs text-ibm-gray70 mt-2">Extracting meaning and facts from text.</p>
+                </div>
+            </div>
+
+            <!-- Multisensory Channels -->
+            <h3 class="text-2xl font-light text-center mb-8">How it looks in practice: <span class="font-semibold">The Learning Channels</span></h3>
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="bg-ibm-white border border-gray-200 p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3 text-ibm-gray100">Auditory (Hearing)</h3>
+                    <p class="text-ibm-gray70 text-sm">Vocalizing words, identifying syllables, and explicitly learning English structure.</p>
+                </div>
+                <div class="bg-ibm-white border border-gray-200 p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3 text-ibm-gray100">Visual (Seeing)</h3>
+                    <p class="text-ibm-gray70 text-sm">Decoding by marking vowels, dividing syllables, and preparing for fluent reading.</p>
+                </div>
+                <div class="bg-ibm-white border border-gray-200 p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold mb-3 text-ibm-gray100">Kinesthetic (Doing)</h3>
+                    <p class="text-ibm-gray70 text-sm">Air tracing, cursive connections, and encoding seamlessly from oral to paper.</p>
+                </div>
+            </div>
+
+            <!-- FAQ Accordion -->
+            <div class="max-w-4xl mx-auto bg-ibm-white border border-gray-200">
+                <h3 class="text-xl font-semibold p-6 border-b border-gray-200 bg-gray-50">Frequently Asked Questions</h3>
+                <details class="group border-b border-gray-200" open>
+                    <summary class="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
+                        <span class="font-medium text-ibm-gray100">How does it differ from other approaches?</span>
+                        <span class="transform transition-transform duration-300 group-open:rotate-180 text-ibm-blue">&#9662;</span>
+                    </summary>
+                    <div class="px-6 pb-6 text-ibm-gray70 text-sm">
+                        Unlike programs that are strictly 1-on-1, Slingerland adapts Orton-Gillingham for the general classroom. It acts preventatively for all students while providing the rigorous structure dyslexic students need.
+                    </div>
+                </details>
+                <details class="group border-b border-gray-200">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
+                        <span class="font-medium text-ibm-gray100">Where can it be used?</span>
+                        <span class="transform transition-transform duration-300 group-open:rotate-180 text-ibm-blue">&#9662;</span>
+                    </summary>
+                    <div class="px-6 pb-6 text-ibm-gray70 text-sm">
+                        It is highly flexible. It is designed for whole classrooms, but is equally effective in small resource groups, special education pull-outs, and 1-on-1 tutoring.
+                    </div>
+                </details>
+                <details class="group">
+                    <summary class="flex items-center justify-between cursor-pointer p-6 hover:bg-gray-50 transition-colors">
+                        <span class="font-medium text-ibm-gray100">Is it compatible with school initiatives?</span>
+                        <span class="transform transition-transform duration-300 group-open:rotate-180 text-ibm-blue">&#9662;</span>
+                    </summary>
+                    <div class="px-6 pb-6 text-ibm-gray70 text-sm">
+                        Yes. Because Slingerland is an <em>approach</em> and not just a boxed curriculum, the instructional techniques can be applied to any existing school reading materials or content area.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Classes, Training, & Certification -->
+    <section id="classes" class="py-24 px-6 bg-ibm-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-light mb-4">Classes &amp; <span class="font-semibold">Certification</span></h2>
+                <p class="text-lg text-ibm-gray70 max-w-2xl mx-auto">
+                    Learn by doing. Our IMSLEC accredited classes provide intensive instruction with a daily student practicum.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16">
+                <!-- Training Overview -->
+                <div>
+                    <h3 class="text-2xl font-semibold mb-6 text-ibm-gray100">Where do I start?</h3>
+                    <div class="border-l-4 border-ibm-blue pl-6 mb-8">
+                        <h4 class="text-xl font-medium text-ibm-blue">1. Introductory Comprehensive</h4>
+                        <p class="text-sm text-ibm-gray70 mt-2 mb-3"><strong>For:</strong> New teachers, tutors, and interventionists. No prerequisites.</p>
+                        <p class="text-sm text-ibm-gray70 mb-4">The foundation. A four-week intensive covering phonics rationale, decoding structures, handwriting integration, and a daily practicum with students.</p>
+                        <button class="px-5 py-2 text-sm font-medium text-white bg-ibm-blue hover:bg-ibm-blueHover">View Schedule &amp; Register</button>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mb-4 text-ibm-gray100 mt-10">Advanced &amp; Group Options</h3>
+                    <ul class="space-y-4">
+                        <li class="bg-ibm-gray10 p-4">
+                            <strong class="block text-ibm-gray100">Continuum Comprehensive</strong>
+                            <span class="text-sm text-ibm-gray70">Prerequisite: Intro Class. Focuses on advanced neurology and curriculum integration.</span>
+                        </li>
+                        <li class="bg-ibm-gray10 p-4 border border-dashed border-gray-400">
+                            <strong class="block text-ibm-gray100">School &amp; District Trainings</strong>
+                            <span class="text-sm text-ibm-gray70">We can bring Slingerland to your district. <a href="#" class="text-ibm-blue hover:underline">Contact us to partner.</a></span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Certification Pathway Diagram -->
+                <div id="certification" class="bg-ibm-gray90 text-white p-8 lg:p-10 shadow-xl">
+                    <h3 class="text-2xl font-semibold mb-2">The Certification Pathway</h3>
+                    <p class="text-sm text-gray-300 mb-8">Gain credibility, deeper expertise, and ensure implementation quality.</p>
+
+                    <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-600 before:to-transparent">
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-ibm-gray90 bg-ibm-blue text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">1</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-ibm-gray100 p-4 rounded shadow">
+                                <h4 class="font-bold">Step 1: Foundational Training</h4>
+                                <p class="text-xs text-gray-400 mt-1">Complete the Introductory Comprehensive Class and Practicum.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-ibm-gray90 bg-ibm-blue text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">2</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-ibm-gray100 p-4 rounded shadow">
+                                <h4 class="font-bold">Step 2: Certified Slingerland Teacher (CST)</h4>
+                                <p class="text-xs text-gray-400 mt-1">Complete Continuum class, submit lesson videos, and undergo formal observation.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                            <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-ibm-gray90 bg-ibm-blue text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow">3</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-ibm-gray100 p-4 rounded shadow">
+                                <h4 class="font-bold">Step 3: Certified Instructor (CSIT)</h4>
+                                <p class="text-xs text-gray-400 mt-1">Complete Intern 1 &amp; Intern 2 to become qualified to train other teachers.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Schools, Tutors & Partners -->
+    <section id="tutors" class="py-20 px-6 bg-ibm-gray10 border-t border-gray-200">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12">
+            <!-- Directory -->
+            <div class="bg-ibm-white p-8 shadow-sm">
+                <h3 class="text-2xl font-light mb-4">Find a <span class="font-semibold text-ibm-blue">School or Tutor</span></h3>
+                <p class="text-ibm-gray70 mb-6 text-sm">Parents: Use our directory to find certified Slingerland tutors and accredited schools in your region to support your child's specific learning needs.</p>
+
+                <div class="flex gap-2 mb-6">
+                    <input type="text" placeholder="Enter City or Zip Code..." class="flex-1 px-4 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-ibm-blue">
+                    <button class="bg-ibm-gray100 text-white px-4 py-2 hover:bg-black">Search</button>
+                </div>
+
+                <p class="text-xs text-gray-500 border-t border-gray-100 pt-4">Are you a certified educator? <a href="#" class="text-ibm-blue hover:underline">Learn how to get listed here.</a></p>
+            </div>
+
+            <!-- Partners & Subscribers -->
+            <div class="space-y-6">
+                <div class="bg-ibm-white p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Subscriber Benefits &amp; Library</h3>
+                    <p class="text-sm text-ibm-gray70 mb-4">Subscribers gain exclusive access to the Slingerland Library: download lesson templates, research summaries, and receive ongoing PD and event discounts.</p>
+                    <button class="text-ibm-blue text-sm font-medium hover:underline">Log in or Subscribe &rarr;</button>
+                </div>
+                <div class="bg-ibm-white p-8 shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Strategic Partners</h3>
+                    <p class="text-sm text-ibm-gray70">We partner with universities and organizations (like the IDA and IMSLEC) to advance the Science of Reading globally.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 7: Free Prototype Materials -->
+    <section id="materials" class="py-24 px-6 bg-ibm-white border-t border-gray-200">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-3xl md:text-4xl font-light mb-4">Instructor &amp; Parent <span class="font-semibold">Resources</span></h2>
+                <p class="text-lg text-ibm-gray70">
+                    Downloadable handouts, drill sheets, and guides formatted in the Slingerland&reg; framework.
+                    <br/><span class="text-sm font-bold text-red-600 mt-2 block">Disclaimer: These documents are prototypes and not for actual use.</span>
+                </p>
+            </div>
+
+            <!-- Download Notification -->
+            <div id="download-notification" class="hidden fixed top-24 right-6 z-50 bg-green-50 border-l-4 border-green-500 p-4 shadow-lg transition-all duration-300">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 text-green-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <div>
+                        <p class="font-bold text-green-800 text-sm">Download Started</p>
+                        <p class="text-green-700 text-xs mt-1">Downloading as PDF format.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Document 1 -->
+                <div class="bg-ibm-white border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-10 h-10 bg-ibm-gray10 text-ibm-blue flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-ibm-gray100 mb-2">1. Multisensory Parent Guide</h3>
+                    <p class="text-sm text-ibm-gray70 flex-grow mb-6">A brief guide to help parents support visual, auditory, and kinesthetic pathways at home.</p>
+                    <button class="text-ibm-blue text-sm font-medium hover:text-ibm-blueHover flex items-center" onclick="downloadPDF('handout_1_parent_guide.pdf', 'md-content-1')">
+                        Download PDF <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                </div>
+                <!-- Document 2 -->
+                <div class="bg-ibm-white border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-10 h-10 bg-ibm-gray10 text-ibm-blue flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-ibm-gray100 mb-2">2. Kinesthetic Handwriting Guide</h3>
+                    <p class="text-sm text-ibm-gray70 flex-grow mb-6">Instructional sheet for practicing letter formation, cursive connections, and tracing.</p>
+                    <button class="text-ibm-blue text-sm font-medium hover:text-ibm-blueHover flex items-center" onclick="downloadPDF('handout_2_kinesthetic_handwriting.pdf', 'md-content-2')">
+                        Download PDF <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                </div>
+                <!-- Document 3 -->
+                <div class="bg-ibm-white border border-gray-200 p-6 flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
+                    <div class="w-10 h-10 bg-ibm-gray10 text-ibm-blue flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-lg font-semibold text-ibm-gray100 mb-2">3. Visual Decoding Steps</h3>
+                    <p class="text-sm text-ibm-gray70 flex-grow mb-6">Reference chart for students to underline vowels, combinations and divide syllables.</p>
+                    <button class="text-ibm-blue text-sm font-medium hover:text-ibm-blueHover flex items-center" onclick="downloadPDF('handout_3_visual_decoding_steps.pdf', 'md-content-3')">
+                        Download PDF <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Shop & Donate -->
+    <section class="py-20 bg-ibm-gray90 text-white border-t border-ibm-blue">
+        <div class="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+
+            <!-- Shop -->
+            <div id="shop">
+                <h3 class="text-2xl font-light mb-2">The Slingerland <span class="font-semibold text-ibm-blue">Shop</span></h3>
+                <p class="text-sm text-gray-300 mb-8">Equip your classroom with official materials, training aids, and reference books.</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="#" class="block bg-white/10 hover:bg-white/20 p-4 border border-gray-600 transition-colors">
+                        <h4 class="font-semibold">Teacher Materials</h4>
+                        <p class="text-xs text-gray-400 mt-1">Manuals, charts, and lesson aids.</p>
+                    </a>
+                    <a href="#" class="block bg-white/10 hover:bg-white/20 p-4 border border-gray-600 transition-colors">
+                        <h4 class="font-semibold">Student Materials</h4>
+                        <p class="text-xs text-gray-400 mt-1">Screening tests and practice books.</p>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Donate & Lead Form -->
+            <div id="donate" class="bg-ibm-white text-ibm-gray100 p-8 shadow-xl">
+                <h3 class="text-2xl font-semibold mb-2 text-ibm-gray100">Support Our Mission</h3>
+                <p class="text-ibm-gray70 text-sm mb-6">Your tax-deductible donation provides scholarships for teachers and outreach to under-resourced schools.</p>
+
+                <div class="flex gap-2 mb-6">
+                    <button class="flex-1 py-2 bg-ibm-gray10 border border-gray-300 hover:bg-ibm-blue hover:text-white transition-colors">$50</button>
+                    <button class="flex-1 py-2 bg-ibm-gray10 border border-gray-300 hover:bg-ibm-blue hover:text-white transition-colors">$100</button>
+                    <button class="flex-1 py-2 bg-ibm-blue text-white font-medium shadow">$250</button>
+                </div>
+
+                <hr class="my-6 border-gray-200" />
+
+                <!-- Training Lead Form -->
+                <h4 class="font-medium text-sm text-ibm-gray100 uppercase tracking-wider mb-3">Request Training Info</h4>
+                <form id="training-form" class="space-y-3">
+                    <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-ibm-blue" placeholder="Enter email for class dates" required>
+                    <button type="submit" id="submit-btn" class="w-full py-2 text-sm font-medium text-ibm-gray100 bg-gray-200 hover:bg-gray-300 transition-colors disabled:opacity-50">
+                        Send Information
+                    </button>
+                </form>
+                <div id="success-msg" class="hidden bg-green-50 border border-green-200 text-green-800 p-3 mt-3 text-sm">
+                    Request Received! We'll be in touch.
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Section 9: About Us & Footer -->
+    <footer id="about" class="bg-[#051525] text-ibm-white py-16 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-12 mb-12 border-b border-gray-700 pb-12">
+            <div class="md:col-span-2">
+                <div class="text-2xl font-semibold tracking-tight text-ibm-white mb-4">
+                    Slingerland<span class="text-ibm-blue">&reg;</span> Institute
+                </div>
+                <p class="text-gray-400 text-sm max-w-md mb-4 leading-relaxed">
+                    The Slingerland Literacy Institute is a 501(c)(3) non-profit organization established in 1977. We train educators to bring meaning and structure to the teaching of reading, empowering all learners.
+                </p>
+                <div class="text-sm text-gray-400 space-y-1">
+                    <p>PO Box 1648, Bellevue, WA 98009</p>
+                    <p>P: (425) 453-1190 | F: (425) 635-7762</p>
+                    <p>Email: mail@slingerland.org</p>
+                </div>
+            </div>
+            <div>
+                <h4 class="text-lg font-medium mb-4 text-white">Quick Links</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#approach" class="hover:text-white transition-colors">The Approach</a></li>
+                    <li><a href="#classes" class="hover:text-white transition-colors">Classes &amp; Certification</a></li>
+                    <li><a href="#tutors" class="hover:text-white transition-colors">Find a School/Tutor</a></li>
+                    <li><a href="#shop" class="hover:text-white transition-colors">Shop Materials</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-medium mb-4 text-white">Legal &amp; Social</h4>
+                <ul class="space-y-2 text-sm text-gray-400 mb-6">
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Accessibility Statement</a></li>
+                </ul>
+                <div class="flex space-x-4">
+                    <a href="#" aria-label="Facebook" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg></a>
+                    <a href="#" aria-label="LinkedIn" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+                    <a href="#" aria-label="YouTube" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="max-w-7xl mx-auto text-sm text-gray-400 space-y-4">
+            <p class="font-medium text-white">
+                &copy; 2026 Slingerland&reg; Literacy Institute. All rights reserved.
+            </p>
+            <p class="leading-relaxed text-xs text-gray-500 text-justify">
+                Slingerland&reg;, The Slingerland&reg; Approach, Slingerland&reg; Format, and the Slingerland logo are registered trademarks of the Slingerland&reg; Literacy Institute.
+                <br/><br/>
+                <strong>Intelligent Protection Notice:</strong> The structural architecture, design conceptualization, and proprietary compilation of digital materials contained within this website prototype are the exclusive intellectual property of Barry Watkins. Unauthorized reproduction, distribution, reverse-engineering, or derivative use of this digital property is strictly prohibited and protected under applicable intellectual property laws.
+            </p>
+
+            <!-- Hidden Admin Toggle -->
+            <div class="mt-8 text-center md:text-left border-t border-gray-800 pt-4">
+                <button id="admin-toggle" class="text-xs text-gray-600 hover:text-ibm-blue transition-colors focus:outline-none">
+                    Admin Access: View Lead Database
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Admin Dashboard Modal -->
+    <div id="admin-modal" class="hidden fixed inset-0 z-[100] bg-ibm-gray100/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl">
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-ibm-gray10">
+                <h2 class="text-xl font-semibold text-ibm-gray100">Training Leads Database</h2>
+                <button id="close-admin" class="text-ibm-gray70 hover:text-red-600 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="square" stroke-linejoin="miter" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 bg-ibm-white">
+                <p class="text-sm text-ibm-gray70 mb-4">Real-time leads from the secure cloud database:</p>
+                <div id="leads-container" class="space-y-3">
+                    <div class="text-sm text-gray-500 italic">Loading leads...</div>
+                </div>
+            </div>
+            <div class="px-6 py-4 border-t border-gray-200 bg-ibm-gray10 flex justify-end">
+                <button id="close-admin-btn" class="px-4 py-2 bg-ibm-gray100 text-white text-sm font-medium hover:bg-black transition-colors">Close Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Markdown Content for Downloads -->
+    <div id="markdown-downloads" style="display: none;">
+        <textarea id="md-content-1">
+***
+**DISCLAIMER: This is a prototype not for actual use.**
+***
+
+# The Slingerland Approach: A Parent's Guide
+
+### 1. The Visual Channel (Seeing)
+* **What it is:** Recognizing the smallest unit of sight - a single letter - and understanding letter combinations and syllable divisions.
+* **At Home:** Encourage your child to look carefully at words. Ask them to point out the vowels.
+
+### 2. The Auditory Channel (Hearing &amp; Speaking)
+* **What it is:** Engaging through sound and speech. This includes identifying syllables, determining vowel sounds.
+* **At Home:** Have your child read out loud. Say the sounds of the letters aloud as they write.
+
+### 3. The Kinesthetic-Motor Channel (Doing)
+* **What it is:** Learning through physical movement (tracing in air, writing in sand).
+        </textarea>
+        <textarea id="md-content-2">
+***
+**DISCLAIMER: This is a prototype not for actual use.**
+***
+
+# Kinesthetic-Motor Pathway: Handwriting
+
+### Daily Practice Steps:
+
+**1. Air Tracing (Gross Motor):**
+* Stand up straight, use dominant arm.
+* Vocalize the letter sound while drawing large arm swings.
+
+**2. Sand/Texture Tracing (Tactile):**
+* Use index finger to trace the letter in sand. Say the sound.
+
+**3. Paper Practice (Fine Motor):**
+* Proper pencil grip. Focus on cursive connections.
+        </textarea>
+        <textarea id="md-content-3">
+***
+**DISCLAIMER: This is a prototype not for actual use.**
+***
+
+# Visual Decoding Procedures
+
+### The 4-Step Decoding Process
+
+**STEP 1: Underline the Vowels**
+* Look for all vowels (a, e, i, o, u, y) and vowel teams.
+
+**STEP 2: Divide the Syllables**
+* Look at the consonant patterns between the vowels. Draw a vertical line.
+
+**STEP 3: Read the Vowel Sounds First**
+* Point to the underlined vowels and say sounds out loud.
+
+**STEP 4: Read Syllable by Syllable**
+* Blend the sounds. Read next syllable. Blend to base word. Add prefixes/suffixes.
+        </textarea>
+    </div>
+
+    <!-- Logic Script: Mobile Menu, Download & Firebase -->
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIconOpen = document.getElementById('menu-icon-open');
+        const menuIconClose = document.getElementById('menu-icon-close');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
+            menuIconOpen.classList.toggle('hidden');
+            menuIconClose.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+                menuIconOpen.classList.remove('hidden');
+                menuIconClose.classList.add('hidden');
+            });
+        });
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Download Function for PDF
+        window.downloadPDF = function(filename, elementId) {
+            const content = document.getElementById(elementId).value.trim();
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(11);
+
+            const margin = 20;
+            const pdfWidth = doc.internal.pageSize.getWidth();
+            const pdfHeight = doc.internal.pageSize.getHeight();
+
+            const lines = doc.splitTextToSize(content, pdfWidth - (margin * 2));
+
+            let y = margin;
+            for (let i = 0; i < lines.length; i++) {
+                if (y > pdfHeight - margin) { doc.addPage(); y = margin; }
+                doc.text(lines[i], margin, y);
+                y += 6;
+            }
+
+            doc.save(filename);
+
+            const notification = document.getElementById('download-notification');
+            notification.classList.remove('hidden');
+            setTimeout(() => { notification.classList.add('hidden'); }, 3000);
+        };
+
+        // Initialize Cloud Database
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { projectId: "demo" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'slingerland-app';
+
+        let currentUser = null;
+        let unsubscribeLeads = null;
+
+        // Establish secure connection
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) { console.error("Auth Error:", error); }
+        };
+
+        initAuth();
+        onAuthStateChanged(auth, (user) => { currentUser = user; });
+
+        // Handle Form Submission
+        const form = document.getElementById('training-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const successMsg = document.getElementById('success-msg');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const emailInput = document.getElementById('email').value;
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Saving...";
+
+            try {
+                const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+                await addDoc(leadsRef, { email: emailInput, date: new Date().toISOString(), userId: currentUser.uid });
+
+                form.style.display = 'none';
+                successMsg.classList.remove('hidden');
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Error - Try Again";
+            }
+        });
+
+        // Admin Dashboard Logic
+        const adminToggle = document.getElementById('admin-toggle');
+        const adminModal = document.getElementById('admin-modal');
+        const closeAdminX = document.getElementById('close-admin');
+        const closeAdminBtn = document.getElementById('close-admin-btn');
+        const leadsContainer = document.getElementById('leads-container');
+
+        const openAdmin = () => {
+            if (!currentUser) return;
+            adminModal.classList.remove('hidden');
+            const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
+
+            unsubscribeLeads = onSnapshot(leadsRef, (snapshot) => {
+                leadsContainer.innerHTML = '';
+                if (snapshot.empty) { leadsContainer.innerHTML = '<div class="text-sm italic">No leads yet.</div>'; return; }
+
+                const leads = [];
+                snapshot.forEach((doc) => { leads.push({ id: doc.id, ...doc.data() }); });
+                leads.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                leads.forEach(lead => {
+                    const dateStr = new Date(lead.date).toLocaleString();
+                    const card = document.createElement('div');
+                    card.className = "flex justify-between items-center p-4 border border-gray-200 bg-gray-50";
+                    card.innerHTML = `<div><p class="font-medium text-ibm-blue">${lead.email}</p><p class="text-xs text-gray-500 mt-1">Submitted: ${dateStr}</p></div>`;
+                    leadsContainer.appendChild(card);
+                });
+            });
+        };
+
+        const closeAdmin = () => {
+            adminModal.classList.add('hidden');
+            if (unsubscribeLeads) unsubscribeLeads();
+        };
+
+        adminToggle.addEventListener('click', openAdmin);
+        closeAdminX.addEventListener('click', closeAdmin);
+        closeAdminBtn.addEventListener('click', closeAdmin);
+    </script>
+</body>
 </html>
