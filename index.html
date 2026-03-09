@@ -660,13 +660,9 @@
         });
     </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Global Download Function for PDF
-        window.downloadPDF = function(filename, elementId) {
+    <!-- PDF Download Function (separate from Firebase to avoid CDN dependency issues) -->
+    <script>
+        function downloadPDF(filename, elementId) {
             const content = document.getElementById(elementId).value.trim();
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
@@ -692,7 +688,13 @@
             const notification = document.getElementById('download-notification');
             notification.classList.remove('hidden');
             setTimeout(() => { notification.classList.add('hidden'); }, 3000);
-        };
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Initialize Cloud Database
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { projectId: "demo" };
@@ -752,6 +754,8 @@
 
         const openAdmin = () => {
             if (!currentUser) return;
+            // Unsubscribe any existing listener to prevent leaks on re-open
+            if (unsubscribeLeads) unsubscribeLeads();
             adminModal.classList.remove('hidden');
             const leadsRef = collection(db, 'artifacts', appId, 'public', 'data', 'leads');
 
@@ -767,7 +771,17 @@
                     const dateStr = new Date(lead.date).toLocaleString();
                     const card = document.createElement('div');
                     card.className = "flex justify-between items-center p-4 border border-gray-200 bg-gray-50";
-                    card.innerHTML = `<div><p class="font-medium text-ibm-blue">${lead.email}</p><p class="text-xs text-gray-500 mt-1">Submitted: ${dateStr}</p></div>`;
+                    const emailText = document.createTextNode(lead.email);
+                    const emailP = document.createElement('p');
+                    emailP.className = 'font-medium text-ibm-blue';
+                    emailP.appendChild(emailText);
+                    const dateP = document.createElement('p');
+                    dateP.className = 'text-xs text-gray-500 mt-1';
+                    dateP.textContent = 'Submitted: ' + dateStr;
+                    const wrapper = document.createElement('div');
+                    wrapper.appendChild(emailP);
+                    wrapper.appendChild(dateP);
+                    card.appendChild(wrapper);
                     leadsContainer.appendChild(card);
                 });
             });
